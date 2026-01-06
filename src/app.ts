@@ -19,6 +19,6 @@ app.use(express.json());
 app.get('/', (req, res) => {
     res.send("Hello, world!")
 })
-app.use('/posts', postRouter)
+app.use('/api/posts', postRouter)
 
 export default app;
