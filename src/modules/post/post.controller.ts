@@ -27,6 +27,25 @@ const createPostController = async (req: Request, res: Response) => {
     }
 }
 
+const getAllPosts = async(req: Request, res: Response) => {
+    try {
+        const result = await postService.getAllPosts()
+
+        res.status(201).json({
+            data: result,
+            message: 'Post Fetched successfully'
+        })
+
+    } catch (error) {
+        res.status(400).json({
+            data: [],
+            error: 'Post fetch failed!',
+            details: error
+        })
+    }
+}   
+
 export const PostController = {
-    createPostController
+    createPostController,
+    getAllPosts
 }

@@ -4,6 +4,7 @@ import express, { Router } from "express";
 
 const router = express.Router();
 
+router.get('/', PostController.getAllPosts)
 router.post("/", auth(UserRole.USER), PostController.createPostController)
 
 export const postRouter: Router = router;
