@@ -13,14 +13,18 @@ const createPost = async (data: Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'a
 }
 
 const getAllPosts = async (
-    { search, tags, isFeatured, status, authorId, page, limit, skip }:
+    { search, tags, isFeatured, status, authorId, page, limit, skip, sortOrder, sortBy }:
     {
-        search: string | undefined, tags: string[], 
-        isFeatured: boolean | undefined, status: PostStatus | undefined, 
+        search: string | undefined, 
+        tags: string[], 
+        isFeatured: boolean | undefined, 
+        status: PostStatus | undefined, 
         authorId: string | undefined,
         page: number,
         limit: number,
-        skip: number
+        skip: number,
+        sortBy: string | undefined,
+        sortOrder: string | undefined
     }) => {
 
     const andConditions: PostWhereInput[] = []
@@ -80,8 +84,14 @@ const getAllPosts = async (
         skip,
         where: {
             AND: andConditions
+        },
+        orderBy: (sortBy && sortOrder) ? {
+            [sortBy]: sortOrder
+        } : {
+            createdAt: "desc"
         }
     })
+
     return result;
 }
 

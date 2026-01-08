@@ -45,7 +45,15 @@ const getAllPosts = async(req: Request, res: Response) => {
 
         const skip = (page - 1) * limit
 
-        const result = await postService.getAllPosts({search: searchString, tags, isFeatured, status, authorId, page, limit, skip})
+        const sortBy = req.query.sortBy as string;
+        const sortOrder = req.query.sortOrder as string
+
+
+        const result = await postService.getAllPosts({
+            search: searchString, tags, isFeatured, status, authorId, page, limit, skip,
+            sortBy,
+            sortOrder
+        })
 
         res.status(201).json({
             data: result,
