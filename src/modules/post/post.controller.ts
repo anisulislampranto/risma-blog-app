@@ -61,9 +61,34 @@ const getAllPosts = async(req: Request, res: Response) => {
             details: error
         })
     }
-}   
+}  
+
+const getPostById = async(req: Request, res: Response) => {
+    try {
+        const id = req.params.id;
+
+        if (!id) {
+            throw new Error("Post id is required!")
+        }
+
+        const result = await postService.getPostById(id)
+
+        res.status(201).json({
+            data: result,
+            message: 'Post Fetched successfully'
+        })
+
+    } catch (error) {
+        res.status(400).json({
+            data: [],
+            error: 'Failed to fetch post by id!',
+            details: error
+        })
+    }
+}
 
 export const PostController = {
     createPostController,
-    getAllPosts
+    getAllPosts,
+    getPostById
 }
