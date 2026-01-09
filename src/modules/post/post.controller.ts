@@ -87,8 +87,33 @@ const getPostById = async(req: Request, res: Response) => {
     }
 }
 
+const getMyPosts = async(req: Request, res: Response) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            throw new Error("author id is required!")
+        }
+
+        const result = await postService.getMyPosts(user.id)
+
+        res.status(200).json({
+            data: result,
+            message: 'My posts Fetched successfully'
+        })
+
+    } catch (error) {
+        console.log('error', error);
+        res.status(400).json({
+            data: [],
+            error: 'Failed to fetch my posts!',
+            details: error
+        })
+    }
+}
+
 export const PostController = {
     createPostController,
     getAllPosts,
-    getPostById
+    getPostById,
+    getMyPosts,
 }
