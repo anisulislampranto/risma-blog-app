@@ -124,12 +124,17 @@ const moderateComment = async (commentId: string, data: { status: CommentStatus 
             id: commentId,
         },
         select: {
+            status: true,
             id: true
         }
     })
 
     if (!commentData) {
         throw new Error("Comment does not exist!")
+    }
+
+    if (commentData.status === data.status) {
+        throw new Error(`${data.status} is already up to date!`)
     }
 
     return prisma.comment.update({
