@@ -95,9 +95,36 @@ const deleteComment = async (req: Request, res: Response) => {
     }
 }
 
+const updateComment = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id;
+
+        if (!id) {
+            throw new Error("Author id is required")
+        }
+
+        const userId = req.user?.id as string;
+
+        const result = await commentService.updateComment(id, req.body, userId)
+
+        res.status(201).json({
+            data: result,
+            message: 'Comment Updated!'
+        })
+
+    } catch (error) {
+        res.status(400).json({
+            data: [],
+            error: 'Comment Update failed!',
+            details: error
+        })
+    }
+}
+
 export const commentController = {
     createCommentController,
     getCommentById,
     getCommentsByAuthor,
-    deleteComment
+    deleteComment,
+    updateComment
 }
