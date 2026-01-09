@@ -118,10 +118,33 @@ const updateComment = async (commentId: string, data: { content?: string, status
     })
 }
 
+const moderateComment = async (commentId: string, data: { status: CommentStatus }) => {
+    const commentData = await prisma.comment.findFirstOrThrow({
+        where: {
+            id: commentId,
+        },
+        select: {
+            id: true
+        }
+    })
+
+    if (!commentData) {
+        throw new Error("Comment does not exist!")
+    }
+
+    return prisma.comment.update({
+        where: {
+            id: commentData.id,
+        },
+        data
+    })
+}
+
 export const commentService = {
     createComment,
     getCommentById,
     getCommentsByAuthor,
     deleteComment,
-    updateComment
+    updateComment,
+    moderateComment
 }
