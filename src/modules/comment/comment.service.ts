@@ -65,8 +65,37 @@ const getCommentsByAuthor = async (authorId: string) => {
     })
 }
 
+
+// conditions
+// should be logged in
+// can delete own comment
+const deleteComment = async (commentId: string, authorId: string) => {
+    const commentData = await prisma.comment.findFirst({
+        where: {
+            id: commentId,
+            authorId
+        },
+        select: {
+            id: true
+        }
+    })
+
+    if (!commentData) {
+        throw new Error("Comment does not exist!")
+    }
+
+    const result = await prisma.comment.delete({
+        where: {
+            id: commentData.id
+        }
+    })
+
+    return result
+}
+
 export const commentService = {
     createComment,
     getCommentById,
-    getCommentsByAuthor
+    getCommentsByAuthor,
+    deleteComment
 }
