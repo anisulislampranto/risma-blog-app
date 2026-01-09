@@ -38,7 +38,8 @@ const getCommentById = async (commentId: string) => {
             post: {
                 select: {
                     id: true,
-                    title: true
+                    title: true,
+                    views: true
                 }
             }
         }
