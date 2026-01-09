@@ -125,21 +125,35 @@ const getPostById = async (postId: string) => {
                 id: postId
             },
             include: {
+                _count: {
+                    select: {
+                        comments: true
+                    }
+                },
                 comments: {
                     where: {
                         parentId: null,
                         status: CommentStatus.APPROVED
+                    },
+                    orderBy: {
+                        createdAt: "desc"
                     },
                     include: {
                         replies: {
                             where: {
                                 status: CommentStatus.APPROVED
                             },
+                            orderBy: {
+                                createdAt: 'asc'
+                            },
                             include: {
                                 replies: {
                                     where: {
                                         status: CommentStatus.APPROVED
-                                    }
+                                    },
+                                    orderBy: {
+                                        createdAt: 'asc'
+                                    },
                                 }
                             }
                         }
