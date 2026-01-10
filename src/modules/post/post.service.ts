@@ -259,7 +259,7 @@ const updatePost = async (postId: string, data: Partial<Post>, authorId: string,
 // Post Delete 
 // 1. User can delete own post. 
 // 2. Admin Can delete anyone's post 
-const deletePost = async(postId: string, authorId: string, isAdmin: boolean) => {
+const deletePost = async (postId: string, authorId: string, isAdmin: boolean) => {
     const postData = await prisma.post.findUniqueOrThrow({
         where: {
             id: postId
@@ -276,7 +276,29 @@ const deletePost = async(postId: string, authorId: string, isAdmin: boolean) => 
 
     return await prisma.post.delete({
         where: {
-            id: postId, 
+            id: postId,
+        }
+    })
+}
+
+const getStats = async () => {
+    // postCount, publishedPost, draftPost, totalComments, totalViews
+    return await prisma.$transaction(async (tx) => {
+
+        const [totalPosts, totalPublishedPosts, totalDraftPosts, totalARCHIVEDPosts] =
+            await Promise.all([
+                await tx.post.count(),
+                await tx.post.count({ where: { status: PostStatus.PUBLISHED } }),
+                await tx.post.count({ where: { status: PostStatus.DRAFT } }),
+                await tx.post.count({ where: { status: PostStatus.ARCHIVED } })
+            ])
+
+
+        return {
+            totalPosts,
+            totalPublishedPosts,
+            totalDraftPosts,
+            totalARCHIVEDPosts
         }
     })
 }
@@ -287,5 +309,6 @@ export const postService = {
     getPostById,
     getMyPosts,
     updatePost,
-    deletePost
+    deletePost,
+    getStats
 }
