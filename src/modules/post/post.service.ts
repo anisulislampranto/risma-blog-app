@@ -255,10 +255,37 @@ const updatePost = async (postId: string, data: Partial<Post>, authorId: string,
     return result
 }
 
+
+// Post Delete 
+// 1. User can delete own post. 
+// 2. Admin Can delete anyone's post 
+const deletePost = async(postId: string, authorId: string, isAdmin: boolean) => {
+    const postData = await prisma.post.findUniqueOrThrow({
+        where: {
+            id: postId
+        },
+        select: {
+            id: true,
+            authorId: true
+        }
+    });
+
+    if (!isAdmin && (postData.authorId !== authorId)) {
+        throw new Error("You are not allowed to updated someones elses post!")
+    }
+
+    return await prisma.post.delete({
+        where: {
+            id: postId, 
+        }
+    })
+}
+
 export const postService = {
     createPost,
     getAllPosts,
     getPostById,
     getMyPosts,
-    updatePost
+    updatePost,
+    deletePost
 }
