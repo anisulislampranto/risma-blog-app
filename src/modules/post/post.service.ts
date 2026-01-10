@@ -1,6 +1,7 @@
 import { CommentStatus, Post, PostStatus } from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
+import { UserRole } from "../../middlewere/auth";
 
 const createPost = async (data: Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'authorId'>, userId: string) => {
     const result = await prisma.post.create({
@@ -285,7 +286,7 @@ const getStats = async () => {
     // postCount, publishedPost, draftPost, totalComments, totalViews
     return await prisma.$transaction(async (tx) => {
 
-        const [totalPosts, totalPublishedPosts, totalDraftPosts, totalARCHIVEDPosts, totalComments, approvedComments, rejectedComments] =
+        const [totalPosts, totalPublishedPosts, totalDraftPosts, totalARCHIVEDPosts, totalComments, approvedComments, rejectedComments, totalUsers, totalAdminCount, userCount] =
             await Promise.all([
                 await tx.post.count(),
                 await tx.post.count({ where: { status: PostStatus.PUBLISHED } }),
@@ -293,7 +294,10 @@ const getStats = async () => {
                 await tx.post.count({ where: { status: PostStatus.ARCHIVED } }),
                 await tx.comment.count(),
                 await tx.comment.count({where: {status: CommentStatus.APPROVED}}),
-                await tx.comment.count({where: {status: CommentStatus.REJECT}})
+                await tx.comment.count({where: {status: CommentStatus.REJECT}}),
+                await tx.user.count(),
+                await tx.user.count({where: {role: UserRole.ADMIN}}),
+                await tx.user.count({where: {role: UserRole.USER}})
             ])
 
 
@@ -304,7 +308,10 @@ const getStats = async () => {
             totalARCHIVEDPosts,
             totalComments,
             approvedComments,
-            rejectedComments
+            rejectedComments,
+            totalUsers,
+            totalAdminCount,
+            userCount
         }
     })
 }
