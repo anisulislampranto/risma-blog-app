@@ -120,8 +120,52 @@ export default function errorHandler(
 
     /* ---------------- Prisma Initialization Error ---------------- */
     else if (err instanceof PrismaClientInitializationError) {
-        statusCode = 500;
-        errorMessage = "Failed to connect to the database.";
+        switch (err.errorCode) {
+            case "P1000":
+                statusCode = 401;
+                errorMessage = "Database authentication failed.";
+                break;
+
+            case "P1001":
+                statusCode = 503;
+                errorMessage = "Cannot reach database server.";
+                break;
+
+            case "P1002":
+                statusCode = 504;
+                errorMessage = "Database connection timed out.";
+                break;
+
+            case "P1003":
+                statusCode = 404;
+                errorMessage = "Database does not exist.";
+                break;
+
+            case "P1008":
+                statusCode = 504;
+                errorMessage = "Database operation timed out.";
+                break;
+
+            case "P1010":
+                statusCode = 403;
+                errorMessage = "Database access denied for this user.";
+                break;
+
+            case "P1011":
+                statusCode = 500;
+                errorMessage = "TLS/SSL connection error with database.";
+                break;
+
+            case "P1012":
+                statusCode = 500;
+                errorMessage = "Invalid database connection URL.";
+                break;
+
+            default:
+                statusCode = 500;
+                errorMessage = "Failed to initialize database connection.";
+                break;
+        }
     }
 
     /* ---------------- Prisma Rust Panic Error ---------------- */
