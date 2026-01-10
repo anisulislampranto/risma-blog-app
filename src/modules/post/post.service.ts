@@ -177,9 +177,9 @@ const getPostById = async (postId: string) => {
 }
 
 
-const getMyPosts = async(authorId: string) => {
+const getMyPosts = async (authorId: string) => {
     await prisma.user.findUniqueOrThrow({
-        where:{
+        where: {
             id: authorId,
             status: "ACTIVE"
         },
@@ -225,12 +225,7 @@ const getMyPosts = async(authorId: string) => {
     };
 }
 
-const updatePost = async(postId: string, data: Partial<Post>, authorId: string) => {
-    console.log({
-        postId,
-        data,
-        authorId
-    });
+const updatePost = async (postId: string, data: Partial<Post>, authorId: string, isAdmin: Boolean) => {
 
     const postData = await prisma.post.findUniqueOrThrow({
         where: {
@@ -242,8 +237,12 @@ const updatePost = async(postId: string, data: Partial<Post>, authorId: string) 
         }
     })
 
-    if (postData.authorId !== authorId) {
+    if (!isAdmin && (postData.authorId !== authorId)) {
         throw new Error("You are not allowed to updated someones elses post!")
+    }
+
+    if (!isAdmin) {
+        delete data.isFeatured;
     }
 
     const result = await prisma.post.update({

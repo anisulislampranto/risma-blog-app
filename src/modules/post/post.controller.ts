@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { postService } from "./post.service";
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationSortingHelper from "../../helpers/paginationSortingHelper";
+import { UserRole } from "../../middlewere/auth";
 
 const createPostController = async (req: Request, res: Response) => {
     try {
@@ -111,16 +112,20 @@ const getMyPosts = async(req: Request, res: Response) => {
     }
 }
 
+
+// user can update own posts, cannot update isFeatured post
+// admin -> can update every post
 const updatePost = async(req: Request, res: Response) => {
     try {
         const user = req.user;
-        const {id} = req.params
+        const {id} = req.params;
+        const isAdmin = user?.role === UserRole.ADMIN
 
         if (!user || !id) {
             throw new Error("author, post id is required!")
         }
 
-        const result = await postService.updatePost(id, req.body, user.id)
+        const result = await postService.updatePost(id, req.body, user.id, isAdmin)
 
         res.status(200).json({
             data: result,
