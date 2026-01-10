@@ -111,7 +111,7 @@ const getMyPosts = async(req: Request, res: Response) => {
 
 // user can update own posts, cannot update isFeatured post
 // admin -> can update every post
-const updatePost = async(req: Request, res: Response) => {
+const updatePost = async(req: Request, res: Response, next: NextFunction) => {
     try {
         const user = req.user;
         const {id} = req.params;
@@ -129,13 +129,7 @@ const updatePost = async(req: Request, res: Response) => {
         })
 
     } catch (error) {
-        const errMessage = (error instanceof Error) ? error.message : 'Failed to update post!'; 
-
-        res.status(400).json({
-            data: [],
-            error: errMessage,
-            details: error
-        })
+        next(error)
     }
 }
 
